@@ -148,6 +148,7 @@
      <Compile Include="Assets\Scripts\5man Combat Scripts\BaseZombie.cs" />
      <Compile Include="Assets\Scripts\FadeIn.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\HomebaseLevelManager.cs" />
      <Compile Include="Assets\Scripts\LevelManager.cs" />
      <Compile Include="Assets\Scripts\LoginManager.cs" />
      <Compile Include="Assets\Scripts\SurvivorPlayCard.cs" />

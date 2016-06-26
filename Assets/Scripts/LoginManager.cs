@@ -9,16 +9,17 @@ using LitJson;
 public class LoginManager : MonoBehaviour {
 
 	[SerializeField]
-	private Text loginPasswordText, loginEmailText, registerEmail, registerPassword, registerPassword2;
+	private Text failedLoginText;
 	private int survivorsDrafted = 0;
 
-	public GameObject registrationPanel, loggedInPanel, survivorDraftPanel;
+	public GameObject loginFailedPanel, returnToGameButton;
 
 //	private string registerUrl = "http://localhost/ARGZ_SERVER/register.php";
 //	private string playerDataUrl = "http://localhost/ARGZ_SERVER/PlayerData.php";
 //	private string loginUrl = "http://localhost/ARGZ_SERVER/login.php";
 
 	private string newSurvivorUrl = "http://argzombie.com/ARGZ_SERVER/create_new_survivor.php";
+	private string homebaseLoginURL = "http://argzombie.com/ARGZ_SERVER/HomebaseLoginCheck.php";
 	
 	// Use this for initialization
 	void Start () { 
@@ -36,10 +37,10 @@ public class LoginManager : MonoBehaviour {
         FB.ActivateApp();
         if (FB.IsLoggedIn) {
             Debug.Log ("FB is logged in");
-            loggedInPanel.SetActive (true);
+			loginFailedPanel.SetActive (false);
         } else {
             Debug.Log ("FB is not logged in");
-            loggedInPanel.SetActive (false);
+			loginFailedPanel.SetActive (true);
         }
         
     }
@@ -73,23 +74,74 @@ public class LoginManager : MonoBehaviour {
             
             if (FB.IsLoggedIn) {
                 Debug.Log ("FB is logged in");
-                loggedInPanel.SetActive (true);
+				loginFailedPanel.SetActive (false);
                 FB.API ("/me?fields=id", HttpMethod.GET, UpdateUserId);
 		        FB.API ("/me?fields=first_name", HttpMethod.GET, UpdateUserFirstName);
 		        FB.API ("/me?fields=last_name", HttpMethod.GET, UpdateUserLastName);
-		        GameManager.instance.ResumeGame();
+
+		        //GameManager.instance.ResumeGame();
             } else {
                 Debug.Log ("FB is NOT logged in");
-                loggedInPanel.SetActive (false);
+				loginFailedPanel.SetActive (false);
             }
-            
         }
-        
+    }
+
+    IEnumerator SendLoginToGameServer() {
+    	WWWForm form = new WWWForm();
+    	form.AddField("id", GameManager.instance.userId);
+    	WWW www = new WWW(homebaseLoginURL, form);
+    	yield return www;
+    	Debug.Log(www.text);
+
+    	if (www.error == null) {
+    		//encode the result into a json object so it can be checked through
+    		string homebaseReturnJson = www.text.ToString();
+    		JsonData homebaseJson = JsonMapper.ToObject(homebaseReturnJson);
+
+    		if (homebaseJson[0].ToString() == "Success") {
+    			//handle the success- load in game data, and go to the game screen
+    			Debug.Log(homebaseJson[1].ToString());
+
+				GameManager.instance.supply = (int)homebaseJson[2]["supply"];
+				GameManager.instance.knife_for_pickup = (int)homebaseJson[2]["knife_for_pickup"];
+				GameManager.instance.club_for_pickup = (int)homebaseJson[2]["club_for_pickup"];
+				GameManager.instance.ammo_for_pickup = (int)homebaseJson[2]["ammo_for_pickup"];
+				GameManager.instance.gun_for_pickup = (int)homebaseJson[2]["gun_for_pickup"];
+				GameManager.instance.active_survivor_for_pickup = (int)homebaseJson[2]["active_survivor_for_pickup"];
+				GameManager.instance.inactive_survivors = (int)homebaseJson[2]["inactive_survivors"];
+				GameManager.instance.dataIsInitialized = true;
+
+				SceneManager.LoadScene("02a Homebase");
+    		} else if (homebaseJson[0].ToString() == "Failed"){
+    			//handle failure- give the user a reason and DO NOT continue to game screen.
+    			failedLoginText.text = homebaseJson[1].ToString();
+    			loginFailedPanel.SetActive(true);
+    		}
+
+    	}else {
+    		Debug.Log("WWW error "+ www.error);
+    	}
+
+    }
+
+    public void ContinueGame () {
+    	if (FB.IsLoggedIn) {
+    		if (GameManager.instance.dataIsInitialized == true) {
+    			SceneManager.LoadScene("02a Homebase");
+    		} else {
+    			StartCoroutine(SendLoginToGameServer());
+    		}
+    	}else {
+    		Debug.Log("Cannot resume game, player must be logged into facebook first");
+    	}
+
     }
     
 	private void UpdateUserId (IResult result) {
 		if (result.Error == null) {
             GameManager.instance.userId = result.ResultDictionary["id"].ToString();
+			StartCoroutine(SendLoginToGameServer());
         } else {
             Debug.Log (result.Error);
         }
@@ -177,26 +229,21 @@ public class LoginManager : MonoBehaviour {
 
 	}
 
-	
-	public void ToggleRegistrationPanel () {
-		if (registrationPanel.activeInHierarchy == false) {
-			registrationPanel.SetActive(true);
-		} else if (registrationPanel.activeInHierarchy == true) {
-			registrationPanel.SetActive(false);
-		}
-	}
-
 	public void FakeLoggedInSuccess () {
-		if (loggedInPanel.activeInHierarchy == false){
-			loggedInPanel.gameObject.SetActive(true);
+		if (loginFailedPanel.activeInHierarchy == false){
+			loginFailedPanel.gameObject.SetActive(true);
 
 			if (FB.IsLoggedIn == true) {
 				//GameManager.instance.ResumeCharacter();
 			}
 
 		} else {
-			loggedInPanel.gameObject.SetActive(false);
+			loginFailedPanel.gameObject.SetActive(false);
 		}
 
+	}
+
+	public void CloseFailedLoginWindow () {
+		loginFailedPanel.SetActive(false);
 	}
 }

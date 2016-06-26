@@ -13,21 +13,15 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 	private Scene activeScene;
 
-	public int survivorsActive, totalSurvivors, daysSurvived, supply, reportedSupply, reportedWater, reportedFood, reportedTotalSurvivor, reportedActiveSurvivor, playerCurrentHealth, zombiesToFight, shivCount, clubCount, gunCount, foodCount, waterCount, mealCount;
-	public DateTime timeCharacterStarted;
-	public float homebaseLat, homebaseLong;
+	public int supply, knife_for_pickup, club_for_pickup, ammo_for_pickup, gun_for_pickup, active_survivor_for_pickup, inactive_survivors;
 	public string userId;
 	public string userFirstName;
 	public string userLastName;
 	public string locationJsonText, clearedBldgJsonText;
+	public bool dataIsInitialized;
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
 
-	//private string startNewCharURL = "http://www.argzombie.com/ARGZ_SERVER/StartNewCharacter.php";
-	private string resumeCharacterUrl = "http://www.argzombie.com/ARGZ_SERVER/ResumeCharacter.php";
-//	private string updateAllStatsURL = "http://www.argzombie.com/ARGZ_SERVER/UpdateAllPlayerStats.php";
-//	private string buildingClearedURL = "http://www.argzombie.com/ARGZ_SERVER/NewBuildingCleared.php";
-	private string clearedBuildingDataURL = "http://www.argzombie.com/ARGZ_SERVER/ClearedBuildingData.php";
 	private string fetchSurvivorDataURL = "http://www.argzombie.com/ARGZ_SERVER/FetchSurvivorData.php";
 
 
@@ -35,7 +29,7 @@ public class GameManager : MonoBehaviour {
 
 	void Awake () {
 		MakeSingleton();
-
+		dataIsInitialized = false;
 		survivorPlayCardPrefab = Resources.Load<SurvivorPlayCard>("Prefabs/SurvivorPlayCard");
 	}
 
@@ -49,7 +43,8 @@ public class GameManager : MonoBehaviour {
 		} else if (activeScene.name.ToString() == "01a Login") {
 			LoginManager loginMgr = FindObjectOfType<LoginManager>();
 			if (FB.IsLoggedIn == true) {
-				loginMgr.loggedInPanel.SetActive(true);
+				loginMgr.loginFailedPanel.SetActive(false);
+				loginMgr.returnToGameButton.SetActive(true);
 			}
 		}
 	}
@@ -63,77 +58,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public void ResumeGame () {
-		StartCoroutine(FetchResumePlayerData());
-		StartCoroutine(FetchSurvivorData());
-	}
-	
-	IEnumerator FetchResumePlayerData () {
-		WWWForm form = new WWWForm();
-		if (FB.IsLoggedIn == true) {
-			form.AddField("id", GameManager.instance.userId);
-		} else {
-			GameManager.instance.userId = "10154194346243929";
-			form.AddField("id", GameManager.instance.userId);
-		}
-
-		WWW www = new WWW(resumeCharacterUrl, form);
-		yield return www;
-
-		if (www.error == null) {
-
-			Debug.Log ("resuming character, server returned raw json string of: " + www.text);
-
-			//write the raw WWW return to a .json file 
-			//File.WriteAllText(Application.dataPath + "/Resources/Player.json", www.text.ToString());
-
-			//read that text out into a string object, and map that to a json object
-			string playerJsonString = www.text.ToString();
-			JsonData playerJson = JsonMapper.ToObject(playerJsonString);
 
 
-			//update the GameManager.instance with all dataum
-			GameManager.instance.userFirstName = playerJson["first_name"].ToString() ;
-			GameManager.instance.userLastName = playerJson["last_name"].ToString();
-			int totsuv = Convert.ToInt32(playerJson["total_survivors"].ToString());
-			GameManager.instance.totalSurvivors = totsuv;
-			int suvAct = Convert.ToInt32(playerJson["active_survivors"].ToString());
-			GameManager.instance.survivorsActive = suvAct;
-			int currHealth = Convert.ToInt32(playerJson["last_player_current_health"].ToString());
-			GameManager.instance.playerCurrentHealth = currHealth;
-			int sup = Convert.ToInt32(playerJson["supply"].ToString());
-			GameManager.instance.supply = sup;
-			int wat = Convert.ToInt32(playerJson["water"].ToString());
-			GameManager.instance.waterCount = wat;
-			int fud = Convert.ToInt32(playerJson["food"].ToString());
-			GameManager.instance.foodCount = fud;
-			int meal = Convert.ToInt32(playerJson["meals"].ToString());
-			GameManager.instance.mealCount = meal;
-			int knifeC = Convert.ToInt32(playerJson["knife_count"].ToString());
-			GameManager.instance.shivCount = knifeC;
-			int clubC = Convert.ToInt32(playerJson["club_count"].ToString());
-			GameManager.instance.clubCount = clubC;
-			int gunC = Convert.ToInt32(playerJson["gun_count"].ToString());
-			GameManager.instance.gunCount = gunC;
-			float homeLat = (float)Convert.ToDouble(playerJson["homebase_lat"].ToString());
-			GameManager.instance.homebaseLat = homeLat;
-			float homeLon = (float)Convert.ToDouble(playerJson["homebase_lon"].ToString());
-			GameManager.instance.homebaseLong = homeLon;
-			Debug.Log ("server returned a date time string of: " + playerJson["char_created_DateTime"]);
-			DateTime oDate = Convert.ToDateTime(playerJson["char_created_DateTime"].ToString());
-			GameManager.instance.timeCharacterStarted = oDate;
-
-			//once the GameManager.instance is updated- you're clear to load the map level.
-//			if (SceneManager.GetActiveScene().buildIndex != 2 ) {
-//				SceneManager.LoadScene("02a Map Level");
-//			}
-
-			yield break;
-		} else {
-			Debug.Log ("WWW error" + www.error);
-		}
-
-	}
 
 	IEnumerator FetchSurvivorData () {
 		//construct form
@@ -141,6 +67,7 @@ public class GameManager : MonoBehaviour {
 		if (FB.IsLoggedIn == true) {
 			form.AddField("id", GameManager.instance.userId);
 		} else {
+			;
 			GameManager.instance.userId = "10154194346243929";
 			form.AddField("id", GameManager.instance.userId);
 		}
