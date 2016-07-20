@@ -203,7 +203,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
 				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("knife", cost, dur, newSup));
+				StartCoroutine(SendCraftStartToServer("knife", cost, dur));
 			}
 		}else if (type == "club") {
 			cost = 125;
@@ -213,7 +213,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
 				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("club", cost, dur, newSup));
+				StartCoroutine(SendCraftStartToServer("club", cost, dur));
 			}
 		}else if (type == "ammo") {
 			cost = 15;
@@ -223,7 +223,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
 				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("ammo", cost, dur, newSup));
+				StartCoroutine(SendCraftStartToServer("ammo", cost, dur));
 			}
 		}else if (type == "gun") {
 			cost = 500;
@@ -233,7 +233,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
 				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("gun", cost, dur, newSup));
+				StartCoroutine(SendCraftStartToServer("gun", cost, dur));
 			}
 		}else if (type == "survivor") {
 			cost = 2000;
@@ -241,7 +241,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
 				int newSup = GameManager.instance.supply;
-				StartCoroutine(SendCraftStartToServer("survivor", cost, dur, newSup));
+				StartCoroutine(SendCraftStartToServer("survivor", cost, dur));
 				GameManager.instance.inactive_survivors--;
 				UpdateTheUI();
 			}
@@ -251,39 +251,32 @@ public class HomebaseLevelManager : MonoBehaviour {
 
 	}
 
-	public bool sendCraftStarted = false;
-	IEnumerator SendCraftStartToServer (string name, int cst, int duration, int newSup) {
-		if (sendCraftStarted == false){
-			sendCraftStarted = true;
-			WWWForm form = new WWWForm();
-			form.AddField("id", GameManager.instance.userId);
-			form.AddField("type", name);
-			form.AddField("cost", cst);
-			form.AddField("duration", duration);
-			form.AddField("new_supply", newSup);
+	IEnumerator SendCraftStartToServer (string name, int cst, int duration) {
+		WWWForm form = new WWWForm();
+		form.AddField("id", GameManager.instance.userId);
+		form.AddField("type", name);
+		form.AddField("cost", cst);
+		form.AddField("duration", duration);
 
-			WWW www = new WWW( startCraftingURL, form);
-			yield return www;
 
-			if (www.error == null) {
-				string returnString = www.text;
-				Debug.Log(returnString);
-				JsonData returnJson = JsonMapper.ToObject(returnString);
+		WWW www = new WWW( startCraftingURL, form);
+		yield return www;
 
-				if (returnJson[0].ToString() == "Success") {
-					Debug.Log(returnJson[1].ToString());
-				} else if (returnJson[0].ToString() == "Failed") {
-					Debug.Log(returnJson[1].ToString());
-				} else {
-					Debug.Log("json returned something other than success or failure");
-				}
-				sendCraftStarted = false;
+		if (www.error == null) {
+			string returnString = www.text;
+			Debug.Log(returnString);
+			JsonData returnJson = JsonMapper.ToObject(returnString);
 
+			if (returnJson[0].ToString() == "Success") {
+				Debug.Log(returnJson[1].ToString());
+			} else if (returnJson[0].ToString() == "Failed") {
+				Debug.Log(returnJson[1].ToString());
 			} else {
-				Debug.Log(www.error);
+				Debug.Log("json returned something other than success or failure");
 			}
 		} else {
-
+			Debug.Log(www.error);
 		}
+		
 	}
 }
