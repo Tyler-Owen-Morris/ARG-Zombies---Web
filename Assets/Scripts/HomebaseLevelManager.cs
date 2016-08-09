@@ -41,13 +41,13 @@ public class HomebaseLevelManager : MonoBehaviour {
 
 	void UpdateTheUI () {
 		supplyText.text = "Supply: " + GameManager.instance.supply.ToString();
-		constructedKnifeText.text = "Knives completed: "+ GameManager.instance.knife_for_pickup.ToString();
-		constructedClubText.text = "Clubs completed: "+ GameManager.instance.club_for_pickup.ToString();
-		constructedAmmoText.text = "Ammo completed: "+ GameManager.instance.ammo_for_pickup.ToString();
-		constructedGunText.text = "Gun completed: " + GameManager.instance.gun_for_pickup.ToString();
 		cuedWeaponText.text = "Weapons in cue: " + weaponsInCue.ToString();
-		activeSurvivorText.text = "Trained Survivors: " + GameManager.instance.active_survivor_for_pickup.ToString();
-		inactiveSurvivorText.text = "Untrained Survivors: " + GameManager.instance.inactive_survivors.ToString();
+//		constructedKnifeText.text = "Knives completed: "+ GameManager.instance.knife_for_pickup.ToString();
+//		constructedClubText.text = "Clubs completed: "+ GameManager.instance.club_for_pickup.ToString();
+//		constructedAmmoText.text = "Ammo completed: "+ GameManager.instance.ammo_for_pickup.ToString();
+//		constructedGunText.text = "Gun completed: " + GameManager.instance.gun_for_pickup.ToString();
+//		activeSurvivorText.text = "Trained Survivors: " + GameManager.instance.active_survivor_for_pickup.ToString();
+//		inactiveSurvivorText.text = "Untrained Survivors: " + GameManager.instance.inactive_survivors.ToString();
 	}
 
 	void UpdateSliderValue () {
@@ -123,29 +123,53 @@ public class HomebaseLevelManager : MonoBehaviour {
 			JsonData craftingJson = JsonMapper.ToObject(returnString);
 
 			if (craftingJson[0].ToString() == "Success") {
-				
-					if (craftingJson[1].ToString() != "none") {
-						weaponsInCue = craftingJson[1].Count-1;
-						weaponActivelyBeingCrafted = true;
-						DateTime soonestWeaponComplete = DateTime.Parse(craftingJson[1][0]["time_complete"].ToString());
-						for (int i = 0; i < craftingJson[1].Count; i++) {
-							//find the soonest weapon to complete, and set that complete time for the slider.
-							DateTime myDoneTime = DateTime.Parse(craftingJson[1][i]["time_complete"].ToString());
-							if (myDoneTime < soonestWeaponComplete) {
-								soonestWeaponComplete = myDoneTime;
-								activeWeaponName = craftingJson[1][i]["type"].ToString();
-								activeWeaponEntryID = (int)craftingJson[1][i]["entry_id"];
-								activeWeaponDuration = (int)craftingJson[1][i]["duration"];
-							}
+
+				//process the array with the weapons in progress
+				if (craftingJson[1].Count > 0) {
+					weaponsInCue = craftingJson[1].Count;
+					weaponActivelyBeingCrafted = true;
+					DateTime soonestWeaponComplete = DateTime.Parse(craftingJson[1][0]["time_complete"].ToString());
+					for (int i = 0; i < craftingJson[1].Count; i++) {
+						//find the soonest weapon to complete, and set that complete time for the slider.
+						DateTime myDoneTime = DateTime.Parse(craftingJson[1][i]["time_complete"].ToString());
+						if (myDoneTime < soonestWeaponComplete) {
+							soonestWeaponComplete = myDoneTime;
+							activeWeaponName = craftingJson[1][i]["type"].ToString();
+							activeWeaponEntryID = (int)craftingJson[1][i]["entry_id"];
+							activeWeaponDuration = (int)craftingJson[1][i]["duration"];
 						}
-						timeActiveWeaponWillComplete = soonestWeaponComplete;
-						UpdateTheUI();
-					} else {
-						weaponsInCue = 0;
-						weaponActivelyBeingCrafted = false;
-						currentCraftingProgressSlider.gameObject.SetActive(false);
-						UpdateTheUI();
 					}
+					timeActiveWeaponWillComplete = soonestWeaponComplete;
+					UpdateTheUI();
+				} else {
+					weaponsInCue = 0;
+					weaponActivelyBeingCrafted = false;
+					currentCraftingProgressSlider.gameObject.SetActive(false);
+
+				}
+
+				//process the array with the completed weapons
+				if (craftingJson[2].Count > 0) {
+					for (int i = 0; craftingJson[2].Count > i; i++) {
+						if (craftingJson[2][i]["type"].ToString() == "shiv") {
+							GameManager.instance.knife_for_pickup ++;
+						} else if (craftingJson[2][i]["type"].ToString() == "hunting knife") {
+							GameManager.instance.knife_for_pickup ++;
+						}else if (craftingJson[2][i]["type"].ToString() == "baseball bat") {
+							GameManager.instance.club_for_pickup ++;
+						}else if (craftingJson[2][i]["type"].ToString() == "sledgehammer") {
+							GameManager.instance.club_for_pickup ++;
+						}else if (craftingJson[2][i]["type"].ToString() == ".22 revolver") {
+							GameManager.instance.gun_for_pickup ++;
+						}else if (craftingJson[2][i]["type"].ToString() == "shotgun") {
+							GameManager.instance.gun_for_pickup ++;
+						}
+					}
+				}
+
+
+				UpdateTheUI();
+
 			} else if (craftingJson[0].ToString() == "Failed") {
 				Debug.Log(craftingJson[1].ToString());
 			} else {
@@ -170,12 +194,12 @@ public class HomebaseLevelManager : MonoBehaviour {
 
 			if (returnJson[0].ToString() == "Success") {
 				GameManager.instance.supply = (int)returnJson[1]["supply"];
-				GameManager.instance.knife_for_pickup = (int)returnJson[1]["knife_for_pickup"];
-				GameManager.instance.club_for_pickup = (int)returnJson[1]["club_for_pickup"];
-				GameManager.instance.ammo_for_pickup = (int)returnJson[1]["ammo_for_pickup"];
-				GameManager.instance.gun_for_pickup = (int)returnJson[1]["gun_for_pickup"];
-				GameManager.instance.active_survivor_for_pickup = (int)returnJson[1]["active_survivor_for_pickup"];
-				GameManager.instance.inactive_survivors = (int)returnJson[1]["inactive_survivors"];
+//				GameManager.instance.knife_for_pickup = (int)returnJson[1]["knife_for_pickup"];
+//				GameManager.instance.club_for_pickup = (int)returnJson[1]["club_for_pickup"];
+//				GameManager.instance.ammo_for_pickup = (int)returnJson[1]["ammo_for_pickup"];
+//				GameManager.instance.gun_for_pickup = (int)returnJson[1]["gun_for_pickup"];
+//				GameManager.instance.active_survivor_for_pickup = (int)returnJson[1]["active_survivor_for_pickup"];
+//				GameManager.instance.inactive_survivors = (int)returnJson[1]["inactive_survivors"];
 
 				UpdateTheUI();
 			} else if (returnJson[0].ToString() == "Failed") {
@@ -192,71 +216,104 @@ public class HomebaseLevelManager : MonoBehaviour {
 		SceneManager.LoadScene("01a Login");
 	}
 
-	public void ConstructWeapon (string type) {
+	public void ConstructWeapon (string wepName) {
 		int cost = 0;
 		int dur = 0;
-		if (type == "knife") {
-			cost = 50;
-			dur = 30;
+		int wep_index =0;
+		if (wepName == "shiv") {
+			cost = 20;
+			dur = 10;
+			wep_index = 1;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("knife", cost, dur));
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
-		}else if (type == "club") {
+		}else if (wepName == "hunting knife") {
+			cost = 100;
+			dur = 45;
+			wep_index = 4;
+			//check if the user has enough currency
+			if (GameManager.instance.supply >= cost) {
+				GameManager.instance.supply = GameManager.instance.supply - cost;
+				UpdateTheUI();
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
+			}
+		}else if (wepName == "baseball bat") {
 			cost = 125;
 			dur = 240;
+			wep_index = 2;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("club", cost, dur));
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
-		}else if (type == "ammo") {
-			cost = 15;
-			dur = 15;
+		}else if (wepName == "sledgehammer") {
+			cost = 125;
+			dur = 30;
+			wep_index = 5;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("ammo", cost, dur));
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
-		}else if (type == "gun") {
+		}else if (wepName == ".22 revolver") {
 			cost = 500;
-			dur = 560;
+			dur = 220;
+			wep_index = 3;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				int newSup = GameManager.instance.supply;
 				UpdateTheUI();
-				StartCoroutine(SendCraftStartToServer("gun", cost, dur));
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
-		}else if (type == "survivor") {
-			cost = 2000;
-			dur = 600;
+		}else if (wepName == "shotgun") {
+			cost = 1000;
+			dur = 560;
+			wep_index = 3;
+			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				int newSup = GameManager.instance.supply;
-				StartCoroutine(SendCraftStartToServer("survivor", cost, dur));
-				GameManager.instance.inactive_survivors--;
 				UpdateTheUI();
+				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
+			}
+		}else if (wepName == "ammo") {
+			cost = 15;
+			dur = 10;
+			wep_index = 0;
+			//check if the user has enough currency
+			if (GameManager.instance.supply >= cost) {
+				GameManager.instance.supply = GameManager.instance.supply - cost;
+				StartCoroutine(SendCraftStartToServer("ammo", cost, dur, wep_index));
 			}
 		}else {
 			Debug.Log("The string is not being sent correctly from the button");
 		}
+//		}else if (wepName == "survivor") {
+//			cost = 2000;
+//			dur = 600;
+//			if (GameManager.instance.supply >= cost) {
+//				GameManager.instance.supply = GameManager.instance.supply - cost;
+//				int newSup = GameManager.instance.supply;
+//				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
+//				GameManager.instance.inactive_survivors--;
+//				UpdateTheUI();
+//			}
+//		}
+
 
 	}
 
-	IEnumerator SendCraftStartToServer (string name, int cst, int duration) {
+	IEnumerator SendCraftStartToServer (string wep_name, int cst, int duration, int weapon_index) {
 		WWWForm form = new WWWForm();
 		form.AddField("id", GameManager.instance.userId);
-		form.AddField("type", name);
+		form.AddField("wep_name", wep_name);
 		form.AddField("cost", cst);
 		form.AddField("duration", duration);
+		form.AddField("weapon_index", weapon_index);
 
 
 		WWW www = new WWW( startCraftingURL, form);
