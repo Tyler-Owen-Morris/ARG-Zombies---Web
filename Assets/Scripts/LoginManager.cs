@@ -110,6 +110,10 @@ public class LoginManager : MonoBehaviour {
 				GameManager.instance.gun_for_pickup = (int)homebaseJson[2]["gun_for_pickup"];
 				GameManager.instance.active_survivor_for_pickup = (int)homebaseJson[2]["active_survivor_for_pickup"];
 				GameManager.instance.inactive_survivors = (int)homebaseJson[2]["inactive_survivors"];
+
+				GameManager.instance.homebase_lat = float.Parse(homebaseJson[3]["homebase_lat"].ToString());
+				GameManager.instance.homebase_lon = float.Parse(homebaseJson[3]["homebase_lon"].ToString());
+
 				GameManager.instance.dataIsInitialized = true;
 
 				SceneManager.LoadScene("02a Homebase");

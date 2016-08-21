@@ -8,8 +8,9 @@ using UnityEngine.SceneManagement;
 public class HomebaseLevelManager : MonoBehaviour {
 
 	//UI elements
-	public Text supplyText, constructedKnifeText, constructedClubText, constructedAmmoText, constructedGunText, activeSurvivorText, inactiveSurvivorText, cuedWeaponText;
+	public Text supplyText, constructedKnifeText, constructedClubText, constructedAmmoText, constructedGunText, activeSurvivorText, inactiveSurvivorText, cuedWeaponText, sliderClockText;
 	public Slider currentCraftingProgressSlider;
+	public GameObject QRPanel;
 
 	//numbers for calculating the active weapon
 	private DateTime timeActiveWeaponWillComplete;
@@ -39,6 +40,15 @@ public class HomebaseLevelManager : MonoBehaviour {
 		}
 	}
 
+	public void QRPanelOpened () {
+		QRPanel.GetComponent<QRPanelController>().ConstructAndEncodeQR();
+		QRPanel.SetActive(true);
+	}
+
+	public void QRPanelClose () {
+		QRPanel.SetActive(false);
+	}
+
 	void UpdateTheUI () {
 		supplyText.text = "Supply: " + GameManager.instance.supply.ToString();
 		cuedWeaponText.text = "Weapons in cue: " + weaponsInCue.ToString();
@@ -55,7 +65,8 @@ public class HomebaseLevelManager : MonoBehaviour {
 
 			//Debug.Log("Weapon completes in "+timeActiveWeaponWillComplete.ToString()+" from now that should be: "+timeUntilFinish.TotalSeconds.ToString());
 
-			float secondsToComplete = activeWeaponDuration*60f;
+			float secondsToComplete = activeWeaponDuration*60.0f;
+			//Debug.Log("Seconds to complete: "+secondsToComplete.ToString());
 			double inverseSliderValue = timeUntilFinish.TotalSeconds / secondsToComplete;
 			double sliderValue = 1.0f - inverseSliderValue;
 			//Debug.Log("slider value should be " + sliderValue.ToString());
@@ -66,43 +77,23 @@ public class HomebaseLevelManager : MonoBehaviour {
 				weaponActivelyBeingCrafted = false;
 				StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
 			}
-	}
 
-//	public bool sendingWeaponCompleteFromClient = false;
-//	IEnumerator SendWeaponCompleteFromClient () {
-//		if (sendingWeaponCompleteFromClient == false) {
-//			sendingWeaponCompleteFromClient = true;
-//			WWWForm form = new WWWForm();
-//			form.AddField("id", GameManager.instance.userId);
-//			form.AddField("entry_id", activeWeaponEntryID);
-//			form.AddField("duration", activeWeaponDuration);
-//			form.AddField("type", activeWeaponName);
-//
-//			WWW www = new WWW( clientCallingCompletedWeaponURL , form);
-//			yield return www;
-//			Debug.Log(www.text);
-//
-//			if (www.error == null) {
-//				string returnString = www.text;
-//				JsonData wepCompleteJson = JsonMapper.ToObject(returnString);
-//
-//				if (wepCompleteJson[0].ToString() == "Success") {
-//					Debug.Log(wepCompleteJson[1].ToString());
-//					weaponActivelyBeingCrafted = false;
-//					StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
-//					sendingWeaponCompleteFromClient = false;	
-//					yield break;
-//				} else if (wepCompleteJson[0].ToString() == "Failed") {
-//					Debug.Log(wepCompleteJson[1].ToString());
-//				} else {
-//					Debug.Log("Server returned a json without success or failure in the index position");
-//				}
-//			}else{
-//				Debug.Log(www.error);
-//			}
-//		} else {
-//			yield break;
-//		}
+			//declare the string to construct from the timespan
+			string myClockText = "";
+			if (timeUntilFinish.Hours > 0) {
+				myClockText += timeUntilFinish.Hours.ToString()+":";
+				timeUntilFinish = timeUntilFinish - TimeSpan.FromHours(timeUntilFinish.Hours);
+			}
+			if(timeUntilFinish.Minutes > 0){
+				myClockText += timeUntilFinish.Minutes.ToString()+":";
+				timeUntilFinish = timeUntilFinish - TimeSpan.FromMinutes(timeUntilFinish.Minutes);
+			}
+			if(timeUntilFinish.Seconds > 0) {
+				myClockText += timeUntilFinish.Seconds.ToString()+"s";
+			}
+			sliderClockText.text = myClockText;
+		}
+
 
 	void UpdateDataFromServer () {
 		StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
@@ -129,6 +120,9 @@ public class HomebaseLevelManager : MonoBehaviour {
 					weaponsInCue = craftingJson[1].Count;
 					weaponActivelyBeingCrafted = true;
 					DateTime soonestWeaponComplete = DateTime.Parse(craftingJson[1][0]["time_complete"].ToString());
+					activeWeaponName = craftingJson[1][0]["type"].ToString();
+					activeWeaponEntryID = (int)craftingJson[1][0]["entry_id"];
+					activeWeaponDuration = (int)craftingJson[1][0]["duration"];
 					for (int i = 0; i < craftingJson[1].Count; i++) {
 						//find the soonest weapon to complete, and set that complete time for the slider.
 						DateTime myDoneTime = DateTime.Parse(craftingJson[1][i]["time_complete"].ToString());
@@ -137,8 +131,10 @@ public class HomebaseLevelManager : MonoBehaviour {
 							activeWeaponName = craftingJson[1][i]["type"].ToString();
 							activeWeaponEntryID = (int)craftingJson[1][i]["entry_id"];
 							activeWeaponDuration = (int)craftingJson[1][i]["duration"];
+							Debug.Log(activeWeaponDuration.ToString());
 						}
 					}
+					Debug.Log("active weapon complete: "+soonestWeaponComplete.ToString()+" active weapon duration: "+activeWeaponDuration.ToString());
 					timeActiveWeaponWillComplete = soonestWeaponComplete;
 					UpdateTheUI();
 				} else {
@@ -222,12 +218,12 @@ public class HomebaseLevelManager : MonoBehaviour {
 		int wep_index =0;
 		if (wepName == "shiv") {
 			cost = 20;
-			dur = 10;
+			dur = 4;
 			wep_index = 1;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "hunting knife") {
@@ -237,27 +233,26 @@ public class HomebaseLevelManager : MonoBehaviour {
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "baseball bat") {
 			cost = 125;
-			dur = 240;
+			dur = 60;
 			wep_index = 2;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "sledgehammer") {
-			cost = 125;
-			dur = 30;
+			cost = 150;
+			dur = 120;
 			wep_index = 5;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == ".22 revolver") {
@@ -267,7 +262,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "shotgun") {
@@ -277,21 +272,23 @@ public class HomebaseLevelManager : MonoBehaviour {
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
-				UpdateTheUI();
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "ammo") {
-			cost = 15;
-			dur = 10;
+			cost = 10;
+			dur = 1;
 			wep_index = 0;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
+				weaponsInCue++;
 				StartCoroutine(SendCraftStartToServer("ammo", cost, dur, wep_index));
 			}
 		}else {
 			Debug.Log("The string is not being sent correctly from the button");
 		}
+		UpdateTheUI();
 //		}else if (wepName == "survivor") {
 //			cost = 2000;
 //			dur = 600;

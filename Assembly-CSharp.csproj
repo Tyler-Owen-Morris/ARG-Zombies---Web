@@ -143,6 +143,14 @@
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\Utils\IFacebookLogger.cs" />
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\Utils\MiniJson.cs" />
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\Utils\Utilities.cs" />
+     <Compile Include="Assets\QRcode\Plugins\Loom\Loom.cs" />
+     <Compile Include="Assets\QRcode\Scripts\CameraPlaneController.cs" />
+     <Compile Include="Assets\QRcode\Scripts\DecodeByStaticPic.cs" />
+     <Compile Include="Assets\QRcode\Scripts\DeviceCameraController.cs" />
+     <Compile Include="Assets\QRcode\Scripts\QRCodeDecodeController.cs" />
+     <Compile Include="Assets\QRcode\Scripts\QRCodeEncodeController.cs" />
+     <Compile Include="Assets\QRcode\Scripts\QRDecodeTest.cs" />
+     <Compile Include="Assets\QRcode\Scripts\QREncodeTest.cs" />
      <Compile Include="Assets\Scripts\5man Combat Scripts\BaseSurvivor.cs" />
      <Compile Include="Assets\Scripts\5man Combat Scripts\BaseWeapon.cs" />
      <Compile Include="Assets\Scripts\5man Combat Scripts\BaseZombie.cs" />
@@ -151,8 +159,10 @@
      <Compile Include="Assets\Scripts\HomebaseLevelManager.cs" />
      <Compile Include="Assets\Scripts\LevelManager.cs" />
      <Compile Include="Assets\Scripts\LoginManager.cs" />
+     <Compile Include="Assets\Scripts\QRPanelController.cs" />
      <Compile Include="Assets\Scripts\SurvivorPlayCard.cs" />
      <None Include="Assets\FacebookSDK\SDK\Editor\android\DefaultAndroidManifest.xml" />
+     <None Include="Assets\QRcode\CamMat\WebCam.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\FacebookSDK\SDK\Scripts\Canvas\Resources\JSSDKBindings.txt" />
  <Reference Include="UnityEngine.UI">
@@ -160,6 +170,9 @@
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="QRCode">
+ <HintPath>/Users/Owen/ARG Zombies - Web/Assets/QRcode/Plugins/QRCode.dll</HintPath>
  </Reference>
  <Reference Include="LitJson">
  <HintPath>/Users/Owen/ARG Zombies - Web/Assets/Resources/LitJson.dll</HintPath>

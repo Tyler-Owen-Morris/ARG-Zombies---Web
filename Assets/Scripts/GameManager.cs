@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
 	public string userFirstName;
 	public string userLastName;
 	public string locationJsonText, clearedBldgJsonText;
+	public float homebase_lat, homebase_lon;
 	public bool dataIsInitialized;
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
