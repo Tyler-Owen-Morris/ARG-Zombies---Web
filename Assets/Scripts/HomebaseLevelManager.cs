@@ -81,15 +81,15 @@ public class HomebaseLevelManager : MonoBehaviour {
 			//declare the string to construct from the timespan
 			string myClockText = "";
 			if (timeUntilFinish.Hours > 0) {
-				myClockText += timeUntilFinish.Hours.ToString()+":";
+				myClockText += timeUntilFinish.Hours.ToString().PadLeft(2, '0')+":";
 				timeUntilFinish = timeUntilFinish - TimeSpan.FromHours(timeUntilFinish.Hours);
 			}
 			if(timeUntilFinish.Minutes > 0){
-				myClockText += timeUntilFinish.Minutes.ToString()+":";
+				myClockText += timeUntilFinish.Minutes.ToString().PadLeft(2, '0')+":";
 				timeUntilFinish = timeUntilFinish - TimeSpan.FromMinutes(timeUntilFinish.Minutes);
 			}
 			if(timeUntilFinish.Seconds > 0) {
-				myClockText += timeUntilFinish.Seconds.ToString()+"s";
+				myClockText += timeUntilFinish.Seconds.ToString().PadLeft(2, '0');
 			}
 			sliderClockText.text = myClockText;
 		}
@@ -268,7 +268,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 		}else if (wepName == "shotgun") {
 			cost = 1000;
 			dur = 560;
-			wep_index = 3;
+			wep_index = 6;
 			//check if the user has enough currency
 			if (GameManager.instance.supply >= cost) {
 				GameManager.instance.supply = GameManager.instance.supply - cost;
