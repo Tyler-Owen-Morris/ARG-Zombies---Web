@@ -64,7 +64,7 @@ public class QRPanelController : MonoBehaviour {
 
 		return Convert.ToBase64String(resultArray, 0, resultArray.Length);
 	}
-
+/*
 public string decryptData(string toDecrypt)
 	{
 		byte[] keyArray = UTF8Encoding.UTF8.GetBytes("12345678901234567890123456789012");
@@ -79,4 +79,6 @@ public string decryptData(string toDecrypt)
 
 		return UTF8Encoding.UTF8.GetString(resultArray);
 	}
+	*/
+	//this is the function to decrypt the encoded string.
 }
