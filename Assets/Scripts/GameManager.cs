@@ -15,15 +15,16 @@ public class GameManager : MonoBehaviour {
 
 	public int supply, knife_for_pickup, club_for_pickup, ammo_for_pickup, gun_for_pickup, active_survivor_for_pickup, inactive_survivors;
 	public string userId;
-	public string userFirstName;
-	public string userLastName;
+	public string userFirstName, userLastName;
+	public string lastLogin_ts;
 	public string locationJsonText, clearedBldgJsonText;
 	public float homebase_lat, homebase_lon;
 	public bool dataIsInitialized;
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
 
-	private string fetchSurvivorDataURL = "http://www.argzombie.com/ARGZ_SERVER/FetchSurvivorData.php";
+	public static string serverURL = "http://www.argzombie.com/ARGZ_DEV_SERVER";
+	private string fetchSurvivorDataURL = GameManager.serverURL+"/FetchSurvivorData.php";
 
 
 	private static SurvivorPlayCard survivorPlayCardPrefab;
@@ -72,6 +73,9 @@ public class GameManager : MonoBehaviour {
 			GameManager.instance.userId = "10154194346243929";
 			form.AddField("id", GameManager.instance.userId);
 		}
+		form.AddField("login_ts", GameManager.instance.lastLogin_ts);
+		form.AddField("client", "web");
+
 		//make www call
 		WWW www = new WWW(fetchSurvivorDataURL, form);
 		yield return www;

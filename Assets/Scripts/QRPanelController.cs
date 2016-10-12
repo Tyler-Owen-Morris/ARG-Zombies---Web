@@ -32,8 +32,8 @@ public class QRPanelController : MonoBehaviour {
 	{
 		if (e_qrController != null) {
 			e_qrController.onQREncodeFinished += qrEncodeFinished;
-			string valueStr = encryptData(qrEncodeString);
-			e_qrController.Encode(valueStr);
+			//string valueStr = encryptData(qrEncodeString);
+			e_qrController.Encode(qrEncodeString);
 		}
 	}
 

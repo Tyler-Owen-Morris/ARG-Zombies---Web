@@ -18,11 +18,11 @@ public class HomebaseLevelManager : MonoBehaviour {
 	public int activeWeaponDuration, activeWeaponEntryID, weaponsInCue;
 	private bool weaponActivelyBeingCrafted = false;
 
-	private string getSupplyURL = "http://www.argzombie.com/ARGZ_SERVER/Homebase_GetSupply.php";
-	private string startCraftingURL = "http://www.argzombie.com/ARGZ_SERVER/Homebase_StartCrafting.php";
-	private string getCraftingStatusURL = "http://www.argzombie.com/ARGZ_SERVER/Homebase_GetCraftingStatus.php";
-	private string getStatusURL = "http://www.argzombie.com/ARGZ_SERVER/Homebase_GetStatus.php";
-	private string clientCallingCompletedWeaponURL = "http://www.argzombie.com/ARGZ_SERVER/Homebase_ClientCallingCraftComplete.php";
+	private string getSupplyURL = GameManager.serverURL+"/Homebase_GetSupply.php";
+	private string startCraftingURL = GameManager.serverURL+"/Homebase_StartCrafting.php";
+	private string getCraftingStatusURL = GameManager.serverURL+"/Homebase_GetCraftingStatus.php";
+	private string getStatusURL = GameManager.serverURL+"/Homebase_GetStatus.php";
+	private string clientCallingCompletedWeaponURL = GameManager.serverURL+"/Homebase_ClientCallingCraftComplete.php";
 
 	void Start () {
 		UpdateTheUI();
@@ -104,6 +104,8 @@ public class HomebaseLevelManager : MonoBehaviour {
 	IEnumerator GetCraftingStatusAndSetCurrentSlider () {
 		WWWForm form = new WWWForm();
 		form.AddField("id", GameManager.instance.userId);
+		form.AddField("login_ts", GameManager.instance.lastLogin_ts);
+		form.AddField("client", "web");
 
 		WWW www = new WWW( getCraftingStatusURL, form);
 		yield return www;
@@ -179,6 +181,8 @@ public class HomebaseLevelManager : MonoBehaviour {
 	IEnumerator UpdateStatsAndTextFromServer () {
 		WWWForm form = new WWWForm();
 		form.AddField("id", GameManager.instance.userId);
+		form.AddField("login_ts", GameManager.instance.lastLogin_ts.ToString());
+		form.AddField("client", "web");
 
 		WWW www = new WWW(getStatusURL, form);
 		yield return www;
@@ -307,6 +311,8 @@ public class HomebaseLevelManager : MonoBehaviour {
 	IEnumerator SendCraftStartToServer (string wep_name, int cst, int duration, int weapon_index) {
 		WWWForm form = new WWWForm();
 		form.AddField("id", GameManager.instance.userId);
+		form.AddField("login_ts", GameManager.instance.lastLogin_ts);
+		form.AddField("client", "web");
 		form.AddField("wep_name", wep_name);
 		form.AddField("cost", cst);
 		form.AddField("duration", duration);

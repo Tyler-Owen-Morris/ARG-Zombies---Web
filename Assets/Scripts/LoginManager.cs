@@ -18,8 +18,8 @@ public class LoginManager : MonoBehaviour {
 //	private string playerDataUrl = "http://localhost/ARGZ_SERVER/PlayerData.php";
 //	private string loginUrl = "http://localhost/ARGZ_SERVER/login.php";
 
-	private string newSurvivorUrl = "http://argzombie.com/ARGZ_SERVER/create_new_survivor.php";
-	private string homebaseLoginURL = "http://argzombie.com/ARGZ_SERVER/HomebaseLoginCheck.php";
+	private string newSurvivorUrl = GameManager.serverURL+"/create_new_survivor.php";
+	private string homebaseLoginURL = GameManager.serverURL+"/HomebaseLoginCheck.php";
 	
 	// Use this for initialization
 	void Start () { 
@@ -90,6 +90,9 @@ public class LoginManager : MonoBehaviour {
     IEnumerator SendLoginToGameServer() {
     	WWWForm form = new WWWForm();
     	form.AddField("id", GameManager.instance.userId);
+		form.AddField("login_ts", "12/31/1999 11:59:59");
+		form.AddField("client", "web");
+
     	WWW www = new WWW(homebaseLoginURL, form);
     	yield return www;
     	Debug.Log(www.text);
@@ -110,9 +113,12 @@ public class LoginManager : MonoBehaviour {
 				GameManager.instance.gun_for_pickup = (int)homebaseJson[2]["gun_for_pickup"];
 				GameManager.instance.active_survivor_for_pickup = (int)homebaseJson[2]["active_survivor_for_pickup"];
 				GameManager.instance.inactive_survivors = (int)homebaseJson[2]["inactive_survivors"];
+				GameManager.instance.lastLogin_ts = homebaseJson[3]["web_login_ts"].ToString();
 
 				GameManager.instance.homebase_lat = float.Parse(homebaseJson[3]["homebase_lat"].ToString());
 				GameManager.instance.homebase_lon = float.Parse(homebaseJson[3]["homebase_lon"].ToString());
+
+				;
 
 				GameManager.instance.dataIsInitialized = true;
 
@@ -202,6 +208,8 @@ public class LoginManager : MonoBehaviour {
 	IEnumerator SendNewSurvivorToServer (string name, string survivor_id, int stamina, int attack) {
 		WWWForm form = new WWWForm();
 		form.AddField("id", GameManager.instance.userId);
+		form.AddField("login_ts", GameManager.instance.lastLogin_ts);
+		form.AddField("client", "web");
 		form.AddField("survivor_id", survivor_id); //this will need to actually pull
 		form.AddField("name", name);
 		form.AddField("base_stam", stamina);
