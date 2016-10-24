@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour {
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
 
-	public static string serverURL = "http://www.argzombie.com/ARGZ_DEV_SERVER";
+	public static string serverURL = "http://www.argzombie.com/ARGZ_SERVER";
 	private string fetchSurvivorDataURL = GameManager.serverURL+"/FetchSurvivorData.php";
 
 
