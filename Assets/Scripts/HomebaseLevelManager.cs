@@ -61,38 +61,38 @@ public class HomebaseLevelManager : MonoBehaviour {
 	}
 
 	void UpdateSliderValue () {
-			TimeSpan timeUntilFinish = timeActiveWeaponWillComplete - DateTime.Now;
+		TimeSpan timeUntilFinish = timeActiveWeaponWillComplete - DateTime.Now;
 
-			//Debug.Log("Weapon completes in "+timeActiveWeaponWillComplete.ToString()+" from now that should be: "+timeUntilFinish.TotalSeconds.ToString());
+		//Debug.Log("Weapon completes in "+timeActiveWeaponWillComplete.ToString()+" from now that should be: "+timeUntilFinish.TotalSeconds.ToString());
 
-			float secondsToComplete = activeWeaponDuration*60.0f;
-			//Debug.Log("Seconds to complete: "+secondsToComplete.ToString());
-			double inverseSliderValue = timeUntilFinish.TotalSeconds / secondsToComplete;
-			double sliderValue = 1.0f - inverseSliderValue;
-			//Debug.Log("slider value should be " + sliderValue.ToString());
-			if (sliderValue <= 1.0f) {
-				currentCraftingProgressSlider.value = (float)sliderValue;
-			} else {
-				currentCraftingProgressSlider.value = 0.0f;
-				weaponActivelyBeingCrafted = false;
-				StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
-			}
-
-			//declare the string to construct from the timespan
-			string myClockText = "";
-			if (timeUntilFinish.Hours > 0) {
-				myClockText += timeUntilFinish.Hours.ToString().PadLeft(2, '0')+":";
-				timeUntilFinish = timeUntilFinish - TimeSpan.FromHours(timeUntilFinish.Hours);
-			}
-			if(timeUntilFinish.Minutes > 0){
-				myClockText += timeUntilFinish.Minutes.ToString().PadLeft(2, '0')+":";
-				timeUntilFinish = timeUntilFinish - TimeSpan.FromMinutes(timeUntilFinish.Minutes);
-			}
-			if(timeUntilFinish.Seconds > 0) {
-				myClockText += timeUntilFinish.Seconds.ToString().PadLeft(2, '0');
-			}
-			sliderClockText.text = myClockText;
+		float secondsToComplete = activeWeaponDuration*60.0f;
+		//Debug.Log("Seconds to complete: "+secondsToComplete.ToString());
+		double inverseSliderValue = timeUntilFinish.TotalSeconds / secondsToComplete;
+		double sliderValue = 1.0f - inverseSliderValue;
+		//Debug.Log("slider value should be " + sliderValue.ToString());
+		if (sliderValue <= 1.0f) {
+			currentCraftingProgressSlider.value = (float)sliderValue;
+		} else {
+			currentCraftingProgressSlider.value = 0.0f;
+			weaponActivelyBeingCrafted = false;
+			StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
 		}
+
+		//declare the string to construct from the timespan
+		string myClockText = "";
+		if (timeUntilFinish.Hours > 0) {
+			myClockText += timeUntilFinish.Hours.ToString().PadLeft(2, '0')+":";
+			timeUntilFinish = timeUntilFinish - TimeSpan.FromHours(timeUntilFinish.Hours);
+		}
+		if(timeUntilFinish.Minutes > 0){
+			myClockText += timeUntilFinish.Minutes.ToString().PadLeft(2, '0')+":";
+			timeUntilFinish = timeUntilFinish - TimeSpan.FromMinutes(timeUntilFinish.Minutes);
+		}
+		if(timeUntilFinish.Seconds > 0) {
+			myClockText += timeUntilFinish.Seconds.ToString().PadLeft(2, '0');
+		}
+		sliderClockText.text = myClockText;
+	}
 
 
 	void UpdateDataFromServer () {
@@ -241,7 +241,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 				StartCoroutine(SendCraftStartToServer(wepName, cost, dur, wep_index));
 			}
 		}else if (wepName == "baseball bat") {
-			cost = 125;
+			cost = 75;
 			dur = 60;
 			wep_index = 2;
 			//check if the user has enough currency

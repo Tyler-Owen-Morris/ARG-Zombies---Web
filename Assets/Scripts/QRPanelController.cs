@@ -32,8 +32,9 @@ public class QRPanelController : MonoBehaviour {
 	{
 		if (e_qrController != null) {
 			e_qrController.onQREncodeFinished += qrEncodeFinished;
-			//string valueStr = encryptData(qrEncodeString);
-			e_qrController.Encode(qrEncodeString);
+			string valueStr = encryptData(qrEncodeString);
+			e_qrController.Encode(valueStr);
+			Debug.Log("Unencrypted string: "+qrEncodeString+"  Encrypted string: "+valueStr);
 		}
 	}
 
@@ -52,7 +53,7 @@ public class QRPanelController : MonoBehaviour {
 
 	public string encryptData(string toEncrypt)
 	{
-		byte[] keyArray = UTF8Encoding.UTF8.GetBytes("12345678901234567890123456789012");
+		byte[] keyArray = UTF8Encoding.UTF8.GetBytes(GameManager.QR_encryption_key);
 		// 256 -AES key 
 		byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
 		RijndaelManaged rDel = new RijndaelManaged();
