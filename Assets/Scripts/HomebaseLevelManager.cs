@@ -10,7 +10,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 	//UI elements
 	public Text supplyText, constructedKnifeText, constructedClubText, constructedAmmoText, constructedGunText, activeSurvivorText, inactiveSurvivorText, cuedWeaponText, sliderClockText;
 	public Slider currentCraftingProgressSlider;
-	public GameObject QRPanel;
+	public GameObject QRPanel, weaponCraftPanel, buildingItemCraftPanel;
 
 	//numbers for calculating the active weapon
 	private DateTime timeActiveWeaponWillComplete;
@@ -39,6 +39,16 @@ public class HomebaseLevelManager : MonoBehaviour {
 			currentCraftingProgressSlider.gameObject.SetActive(false);
 		}
 	}
+
+    public void OpenWeaponCraftPanel() {
+        weaponCraftPanel.SetActive(true);
+        buildingItemCraftPanel.SetActive(false);
+    }
+
+    public void OpenBuildingItemCraftPanel() {
+        weaponCraftPanel.SetActive(false);
+        buildingItemCraftPanel.SetActive(true);
+    }
 
 	public void QRPanelOpened () {
 		QRPanel.GetComponent<QRPanelController>().ConstructAndEncodeQR();
@@ -339,4 +349,28 @@ public class HomebaseLevelManager : MonoBehaviour {
 		}
 		
 	}
+
+    public void ConstructBuildingItem(string item_string) {
+
+        if (item_string == "trap")
+        {
+            int cost = 30;
+            int duration = 20;
+            int index_no = 0;
+            StartCoroutine(SendCraftStartToServer(item_string, cost, duration, index_no));
+        } else if (item_string == "barrel")
+        {
+            int cost = 75;
+            int duration = 45;
+            int index_no = 0;
+            StartCoroutine(SendCraftStartToServer(item_string, cost, duration, index_no));
+        } else if (item_string == "greenhouse")
+        {
+            int cost = 100;
+            int duration = 120;
+            int index_no = 0;
+            StartCoroutine(SendCraftStartToServer(item_string, cost, duration, index_no));
+        }
+
+    }
 }
