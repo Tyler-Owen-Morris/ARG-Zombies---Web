@@ -73,13 +73,13 @@ public class HomebaseLevelManager : MonoBehaviour {
 	void UpdateSliderValue () {
 		TimeSpan timeUntilFinish = timeActiveWeaponWillComplete - DateTime.Now;
 
-		//Debug.Log("Weapon completes in "+timeActiveWeaponWillComplete.ToString()+" from now that should be: "+timeUntilFinish.TotalSeconds.ToString());
+		Debug.Log("Weapon completes in "+timeActiveWeaponWillComplete.ToString()+" from now that should be: "+timeUntilFinish.TotalSeconds.ToString());
 
 		float secondsToComplete = activeWeaponDuration*60.0f;
-		//Debug.Log("Seconds to complete: "+secondsToComplete.ToString());
+		Debug.Log("Seconds to complete: "+secondsToComplete.ToString());
 		double inverseSliderValue = timeUntilFinish.TotalSeconds / secondsToComplete;
 		double sliderValue = 1.0f - inverseSliderValue;
-		//Debug.Log("slider value should be " + sliderValue.ToString());
+		Debug.Log("inverse slider value should be " + inverseSliderValue.ToString());
 		if (sliderValue <= 1.0f) {
 			currentCraftingProgressSlider.value = (float)sliderValue;
 		} else {
