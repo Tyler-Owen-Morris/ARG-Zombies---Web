@@ -106,13 +106,8 @@ public class LoginManager : MonoBehaviour {
     			//handle the success- load in game data, and go to the game screen
     			Debug.Log(homebaseJson[1].ToString());
 
-				GameManager.instance.supply = (int)homebaseJson[2]["supply"];
-				GameManager.instance.knife_for_pickup = (int)homebaseJson[2]["knife_for_pickup"];
-				GameManager.instance.club_for_pickup = (int)homebaseJson[2]["club_for_pickup"];
-				GameManager.instance.ammo_for_pickup = (int)homebaseJson[2]["ammo_for_pickup"];
-				GameManager.instance.gun_for_pickup = (int)homebaseJson[2]["gun_for_pickup"];
-				GameManager.instance.active_survivor_for_pickup = (int)homebaseJson[2]["active_survivor_for_pickup"];
-				GameManager.instance.inactive_survivors = (int)homebaseJson[2]["inactive_survivors"];
+				GameManager.instance.wood = (int)homebaseJson[2]["wood"];
+                GameManager.instance.metal = (int)homebaseJson[2]["metal"];
 				GameManager.instance.lastLogin_ts = homebaseJson[3]["web_login_ts"].ToString();
 
 				GameManager.instance.homebase_lat = float.Parse(homebaseJson[3]["homebase_lat"].ToString());

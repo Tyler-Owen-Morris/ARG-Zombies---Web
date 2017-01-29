@@ -13,7 +13,8 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 	private Scene activeScene;
 
-	public int supply, knife_for_pickup, club_for_pickup, ammo_for_pickup, gun_for_pickup, active_survivor_for_pickup, inactive_survivors;
+	public int wood, metal;
+    public bool crafting_t1, crafting_t2, crafting_t3;
 	public string userId;
 	public string userFirstName, userLastName;
 	public string lastLogin_ts;
