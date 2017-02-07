@@ -8,11 +8,12 @@ using UnityEngine.SceneManagement;
 public class HomebaseLevelManager : MonoBehaviour {
 
 	//UI elements
-	public Text woodText, metalText, constructedKnifeText, constructedClubText, constructedAmmoText, constructedGunText, activeSurvivorText, inactiveSurvivorText, cuedWeaponText, sliderClockText;
-	public Slider currentCraftingProgressSlider;
-	public GameObject QRPanel, weaponCraftPanel, buildingItemCraftPanel, constructionItemCraftPanel, confirmCraftCancelPanel;
+	public Text woodText, metalText, cuedWeaponText, sliderClockText, fitbitDistanceText;
+	public Slider currentCraftingProgressSlider, fitbitSlider;
+	public GameObject QRPanel, weaponCraftPanel, buildingItemCraftPanel, constructionItemCraftPanel, confirmCraftCancelPanel, fitbitDisplayPanel, fitbitLoginButton;
     public Button[] T1_weapons, T2_weapons, T3_weapons;
     public Button T1_craft_button, T2_craft_button, T3_craft_button, cancel_craft_button;
+    public FitbitManager myFitbitMgr;
 
 	//numbers for calculating the active weapon
 	private DateTime timeActiveWeaponWillComplete, serverTimeNow;
@@ -32,6 +33,18 @@ public class HomebaseLevelManager : MonoBehaviour {
 	void Start () {
 		//UpdateTheUI();
 		InvokeRepeating("UpdateDataFromServer", 0f, 10f);
+
+        if (GameManager.instance.fitbit_access_token.Length > 10 && GameManager.instance.fitbit_token_expiration > DateTime.Now)
+        {
+            fitbitDisplayPanel.SetActive(true);
+            fitbitLoginButton.SetActive(false);
+            //myFitbitMgr.UserAcceptOrDeny();
+           // myFitbitMgr.RefreshTokens();
+        } else if (GameManager.instance.fitbit_access_token == "" || GameManager.instance.fitbit_access_token == null)
+        {
+            fitbitLoginButton.SetActive(true);
+            fitbitDisplayPanel.SetActive(false);
+        }
 	}
 
 	void Update () {
@@ -105,6 +118,15 @@ public class HomebaseLevelManager : MonoBehaviour {
 //		activeSurvivorText.text = "Trained Survivors: " + GameManager.instance.active_survivor_for_pickup.ToString();
 //		inactiveSurvivorText.text = "Untrained Survivors: " + GameManager.instance.inactive_survivors.ToString();
 	}
+
+    public void UpdateDistance(float distance)
+    {
+        GameManager.instance.fitbit_distance = distance;
+        float value = distance / 10.0f;
+        fitbitSlider.value = value;
+        fitbitDistanceText.text = distance.ToString().Substring(0,3)+" miles";
+        Debug.Log("Todays distance: "+distance+" setting slider value to: "+value);
+    }
 
     void UpdateButtonStatus ()
     {
@@ -228,7 +250,7 @@ public class HomebaseLevelManager : MonoBehaviour {
     }
 
 
-	void UpdateDataFromServer () {
+	public void UpdateDataFromServer () {
 		StartCoroutine(GetCraftingStatusAndSetCurrentSlider());
 		StartCoroutine(UpdateStatsAndTextFromServer());
 	}
@@ -314,9 +336,21 @@ public class HomebaseLevelManager : MonoBehaviour {
 			if (returnJson[0].ToString() == "Success") {
 				GameManager.instance.wood = (int)returnJson[1]["wood"];
                 GameManager.instance.metal = (int)returnJson[1]["metal"];
+                GameManager.instance.fitbit_authorization_code = returnJson[1]["fitbit_authorization_code"].ToString();
+                GameManager.instance.fitbit_access_token = returnJson[1]["fitbit_access_token"].ToString();
+                GameManager.instance.fitbit_refresh_token = returnJson[1]["fitbit_refresh_token"].ToString();
+                string expire_time = returnJson[1]["fitbit_expire_datetime"].ToString();
+                if (expire_time != "" && expire_time != "0000-00-00 00:00:00")
+                {
+                    GameManager.instance.fitbit_token_expiration = DateTime.Parse(expire_time);
+                }else
+                {
+                    Debug.Log("player has not sync'ed their fitbit account.");
+                }
                 int t1 = (int)returnJson[1]["craft_t1"];
                 int t2 = (int)returnJson[1]["craft_t2"];
                 int t3 = (int)returnJson[1]["craft_t3"];
+                
                 if (t1 == 0)
                 {
                     GameManager.instance.crafting_t1 = false;

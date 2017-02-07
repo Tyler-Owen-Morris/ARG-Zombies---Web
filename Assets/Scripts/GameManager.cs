@@ -14,8 +14,10 @@ public class GameManager : MonoBehaviour {
 	private Scene activeScene;
 
 	public int wood, metal;
+    public float fitbit_distance;
     public bool crafting_t1, crafting_t2, crafting_t3;
-	public string userId;
+	public string userId, fitbit_authorization_code, fitbit_access_token, fitbit_refresh_token;
+    public DateTime fitbit_token_expiration;
 	public string userFirstName, userLastName;
 	public string lastLogin_ts;
 	public string locationJsonText, clearedBldgJsonText;
@@ -24,7 +26,8 @@ public class GameManager : MonoBehaviour {
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
 
-	public static string serverURL = "http://www.argzombie.com/ARGZ_SERVER";
+	public static string serverURL = "http://www.argzombie.com/ARGZ_DEV_SERVER"; //public web address for development
+    //public static string serverURL = "localhost://ARGZ_SERVER";//localhost should be fine for the web client running local to the DB
 	public static string QR_encryption_key = "12345678901234567890123456789012";
 	private string fetchSurvivorDataURL = GameManager.serverURL+"/FetchSurvivorData.php";
 
@@ -37,7 +40,17 @@ public class GameManager : MonoBehaviour {
 		survivorPlayCardPrefab = Resources.Load<SurvivorPlayCard>("Prefabs/SurvivorPlayCard");
 	}
 
-	void OnLevelWasLoaded () {
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable ()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+	void OnLevelFinishedLoading (Scene scene, LoadSceneMode mode) {
 		//this is a catch all to slave the long term memory to the active GameManager.instance object- each load will update long term memory.
 
 
@@ -61,8 +74,6 @@ public class GameManager : MonoBehaviour {
 			DontDestroyOnLoad (gameObject);
 		}
 	}
-
-
 
 
 	IEnumerator FetchSurvivorData () {

@@ -113,9 +113,20 @@ public class LoginManager : MonoBehaviour {
 				GameManager.instance.homebase_lat = float.Parse(homebaseJson[3]["homebase_lat"].ToString());
 				GameManager.instance.homebase_lon = float.Parse(homebaseJson[3]["homebase_lon"].ToString());
 
-				;
+                GameManager.instance.fitbit_authorization_code = homebaseJson[2]["fitbit_authorization_code"].ToString();
+                GameManager.instance.fitbit_access_token = homebaseJson[2]["fitbit_access_token"].ToString();
+                GameManager.instance.fitbit_refresh_token = homebaseJson[2]["fitbit_refresh_token"].ToString();
+                string expire_time = homebaseJson[2]["fitbit_expire_datetime"].ToString();
+                if (expire_time != "" && expire_time != "0000-00-00 00:00:00")
+                {
+                    GameManager.instance.fitbit_token_expiration = System.DateTime.Parse(expire_time);
+                }
+                else
+                {
+                    Debug.Log("player has not sync'ed their fitbit account.");
+                }
 
-				GameManager.instance.dataIsInitialized = true;
+                GameManager.instance.dataIsInitialized = true;
 
 				SceneManager.LoadScene("02a Homebase");
     		} else if (homebaseJson[0].ToString() == "Failed"){
