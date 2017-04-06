@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviour {
 
 	public List <GameObject> survivorCardList = new List<GameObject>();
 
-	//public static string serverURL = "http://game.argzombie.com/ARGZ_SERVER"; //public web address for development
-    public static string serverURL = "localhost://ARGZ_SERVER";//localhost should be fine for the web client running local to the DB
+	public static string serverURL = "http://game.argzombie.com/ARGZ_SERVER"; //public web address for development
+    //public static string serverURL = "localhost://ARGZ_SERVER";//localhost should be fine for the web client running local to the DB
 	public static string QR_encryption_key = "12345678901234567890123456789012";
 	private string fetchSurvivorDataURL = GameManager.serverURL+"/FetchSurvivorData.php";
 

@@ -17,6 +17,7 @@ public class QRPanelController : MonoBehaviour {
 		if (e_qrController != null) {
 			e_qrController.onQREncodeFinished += qrEncodeFinished;//Add Finished Event
 		}
+        Encode();
 	}
 	
 	void qrEncodeFinished(Texture2D tex)
