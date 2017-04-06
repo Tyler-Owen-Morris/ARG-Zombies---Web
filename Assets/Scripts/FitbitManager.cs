@@ -24,6 +24,7 @@ public class FitbitManager : MonoBehaviour {
 
     void Start ()
     {
+        /*
         if (GameManager.instance.fitbit_token_expiration < DateTime.Now && GameManager.instance.fitbit_refresh_token != "")
         {
             //refresh access token, and get updated fitbit data
@@ -33,6 +34,8 @@ public class FitbitManager : MonoBehaviour {
             //just try to get the fitbit update data
             StartCoroutine(UpdateFitbitData());
         }
+        */
+        //disable for current build
     }
 
     public void UserAcceptOrDeny ()

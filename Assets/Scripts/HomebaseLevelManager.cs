@@ -10,7 +10,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 	//UI elements
 	public Text woodText, metalText, cuedWeaponText, sliderClockText, fitbitDistanceText;
 	public Slider currentCraftingProgressSlider, fitbitSlider;
-	public GameObject QRPanel, weaponCraftPanel, buildingItemCraftPanel, constructionItemCraftPanel, confirmCraftCancelPanel, fitbitDisplayPanel, fitbitLoginButton;
+	public GameObject QRPanel, garagePanel, weaponCraftPanel, buildingItemCraftPanel, constructionItemCraftPanel, confirmCraftCancelPanel, fitbitDisplayPanel, fitbitLoginButton;
     public Button[] T1_weapons, T2_weapons, T3_weapons;
     public Button T1_craft_button, T2_craft_button, T3_craft_button, cancel_craft_button;
     public FitbitManager myFitbitMgr;
@@ -34,6 +34,7 @@ public class HomebaseLevelManager : MonoBehaviour {
 		//UpdateTheUI();
 		InvokeRepeating("UpdateDataFromServer", 0f, 10f);
 
+        /*
         if (GameManager.instance.fitbit_access_token.Length > 10 && GameManager.instance.fitbit_token_expiration > DateTime.Now)
         {
             fitbitDisplayPanel.SetActive(true);
@@ -45,6 +46,7 @@ public class HomebaseLevelManager : MonoBehaviour {
             fitbitLoginButton.SetActive(true);
             fitbitDisplayPanel.SetActive(false);
         }
+        */
 	}
 
 	void Update () {
@@ -59,6 +61,17 @@ public class HomebaseLevelManager : MonoBehaviour {
             cancel_craft_button.gameObject.SetActive(false);
 		}
 	}
+
+    public void ToggleGaragePanel ()
+    {
+        if (garagePanel.activeInHierarchy)
+        {
+            garagePanel.SetActive(false);
+        }else
+        {
+            garagePanel.SetActive(true);
+        }
+    }
 
     public void OpenWeaponCraftPanel() {
         weaponCraftPanel.SetActive(true);
